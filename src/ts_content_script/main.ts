@@ -1,10 +1,20 @@
+interface GithubPageType {
+    urlMatches: Function,
+    inject: Function,
+}
+
+const registeredGithubPageTypes: Array<GithubPageType> = [
+    GithubIssue,
+    GithubPR,
+];
+
 function onPageLoad() { // Called by github_navigation.js.
-    GithubAPI.fetchOpenPRs('mozilla-mobile', 'focus-android').then(resItems => {
-        console.log('fetched!');
-        resItems.forEach(e => {
-            Log.log(e.title);
-        });
-    }).catch(err => {
-        Log.error(err);
+    const url = window.location;
+    const matchingPageType = registeredGithubPageTypes.find(page => {
+        return page.urlMatches(url);
     });
+
+    if (matchingPageType != null) {
+        matchingPageType.inject();
+    }
 }

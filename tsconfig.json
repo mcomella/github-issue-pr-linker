@@ -7,7 +7,7 @@
         "noImplicitAny": true,
         "noImplicitThis": true,
 
-        "target": "es2015",
+        "target": "es6",
     },
     "include": [
         "./src/ts_content_script/*"
