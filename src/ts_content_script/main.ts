@@ -4,8 +4,8 @@ interface GithubPageType {
 }
 
 const registeredGithubPageTypes: Array<GithubPageType> = [
-    GithubIssue,
-    GithubPR,
+    GithubPageIssue,
+    GithubPagePR,
 ];
 
 function onPageLoad() { // Called by github_navigation.js.

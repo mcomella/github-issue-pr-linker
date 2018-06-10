@@ -1,4 +1,4 @@
-namespace GithubPR {
+namespace GithubPagePR {
 
     // sample: https://github.com/mozilla-mobile/focus-android/pull/2721
     const RE_URL = /.+github.com\/([^/]+)\/([^/]+)\/pull\/([0-9]+)/;

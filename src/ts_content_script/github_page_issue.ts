@@ -1,4 +1,4 @@
-namespace GithubIssue {
+namespace GithubPageIssue {
 
     // sample: https://github.com/mozilla-mobile/focus-android/issues/2726
     const RE_URL = /.+github.com\/([^/]+)\/([^/]+)\/issues\/([0-9]+)/;
@@ -8,7 +8,6 @@ namespace GithubIssue {
     }
 
     export function inject() {
-        Log.l('github issue');
     }
 
     // GithubAPI.fetchOpenPRs('mozilla-mobile', 'focus-android').then(resItems => {

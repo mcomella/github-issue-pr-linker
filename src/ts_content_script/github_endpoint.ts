@@ -1,4 +1,7 @@
-namespace GithubAPI {
+/*
+ * Makes calls directly to the GitHub endpoint without caching.
+ */
+namespace GithubEndpoint {
     const SHOULD_MAKE_REQUEST = true;
 
     const BASE_URL = "https://api.github.com";
