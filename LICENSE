@@ -1,3 +1,13 @@
+Typescript type definitions (src/ts_content_script/types/) are available via
+DefinitelyTyped [1] under the MIT license. The license file is included in that
+directory.
+
+[1]: https://github.com/DefinitelyTyped/DefinitelyTyped
+
+---
+
+All other files are available under the following license:
+
 Copyright (C) 2018 Michael Comella
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
