@@ -8,14 +8,19 @@ namespace GithubPageIssue {
     }
 
     export function inject() {
+        const {repo, owner, issueNumber} = getRepoOwnerIssueNum(window.location);
+        Github.getPRForIssue(owner, repo, issueNumber).then(pr => {
+            // TODO: mutate the dom.
+        });
     }
 
-    // GithubAPI.fetchOpenPRs('mozilla-mobile', 'focus-android').then(resItems => {
-    //     console.log('fetched!');
-    //     resItems.forEach(e => {
-    //         Log.log(e.title);
-    //     });
-    // }).catch(err => {
-    //     Log.error(err);
-    // });
+    function getRepoOwnerIssueNum(url: Location) {
+        const maybeMatch = RE_URL.exec(url.toString());
+        if (maybeMatch == null) { throw new Error('Regex doesn\'t match url'); }
+        return {
+            owner: maybeMatch[1],
+            repo: maybeMatch[2],
+            issueNumber: parseInt(maybeMatch[3]),
+        }
+    }
 }
