@@ -1,16 +1,18 @@
 {
 
-"manifest_version": 2,
-"name": "GitHub Issue PR Linker",
-"version": "0.0.1",
+    "manifest_version": 2,
+    "name": "GitHub Issue PR Linker",
+    "version": "0.0.1",
 
-"description": "",
+    "description": "",
 
-"content_scripts": [
-  {
-    "matches": ["*://*.github.com/*"],
-    "js": ["src/github_navigation.js", "src/content_script.js"]
-  }
-]
+    "content_scripts": [{
+        "matches": ["*://*.github.com/*"],
+        "js": ["src/content_script.js", "src/github_navigation.js"]
+    }],
 
+    "permissions": [
+        "*://api.github.com/*",
+        "webRequest"
+    ]
 }
