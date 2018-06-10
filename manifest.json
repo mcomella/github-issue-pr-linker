@@ -9,7 +9,7 @@
 "content_scripts": [
   {
     "matches": ["*://*.github.com/*"],
-    "js": ["src/github_navigation.js"]
+    "js": ["src/github_navigation.js", "src/content_script.js"]
   }
 ]
 

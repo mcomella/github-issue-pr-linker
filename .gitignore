@@ -1,5 +1,5 @@
 # Build
-build/
+src/content_script.js*
 
 # Editor
 .vscode

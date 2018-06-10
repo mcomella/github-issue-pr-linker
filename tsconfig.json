@@ -1,9 +1,14 @@
 {
     "compilerOptions": {
-        "outDir": "./build",
-        "allowJs": true
+        "outFile": "./src/content_script.js",
+        "sourceMap": true,
+
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true
+
     },
     "include": [
-        "./src/*"
+        "./src/ts_content_script/*"
     ]
 }
