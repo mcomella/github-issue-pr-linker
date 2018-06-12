@@ -10,6 +10,6 @@
         "target": "es6",
     },
     "include": [
-        "./src/ts_content_script/*"
+        "./src/ts_content_script/**/*"
     ]
 }
