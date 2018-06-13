@@ -2,7 +2,7 @@
  * Makes calls directly to the GitHub endpoint without caching.
  */
 namespace GithubEndpoint {
-    const SHOULD_MAKE_REQUEST = false;
+    const SHOULD_MAKE_REQUEST = true;
 
     const BASE_URL = "https://api.github.com";
 
@@ -23,7 +23,7 @@ namespace GithubEndpoint {
         // TODO: handle at API limit.
         return fetch(request).then(response => {
             if (response.status >= 300) {
-                throw new Error('fetchOpenPRs response not success');
+                throw new Error('fetchOpenPRs response not success: ' + response.statusText);
             }
 
             return response.json();

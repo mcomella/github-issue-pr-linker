@@ -7,3 +7,7 @@ interface ObjectStringToAny {
     prototype: object;
     new: object;
 }
+
+interface ObjectStringToNumberSet {
+    [key: string]: Set<number>;
+}

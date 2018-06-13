@@ -20,13 +20,21 @@ namespace Github {
      *
      * This return promise may reject if there's an error, e.g. in the returned storage or network layers.
      */
-    export async function getPRsForIssue(owner: string, repo: string, issueNumber: number): Promise<GithubEndpoint.PR[]> {
+    export async function getPRsForIssue(owner: string, repo: string, issueNumber: number): Promise<Set<number>> {
         try {
             await maybeUpdatePRCache(owner, repo);
         } catch (e) {
             Log.e(`Unable to update PR cache, will fall back: ${e}`);
         }
-        return getStorage().get(getKeyIssueToPR(owner, repo, issueNumber)); // TODO: convert keys to PR numbers.
+
+        const issueToPRKey = getKeyIssueToPR(owner, repo, issueNumber);
+        const issueKeysToPRs = await getStorage().get(issueToPRKey) as ObjectStringToNumberSet;
+        const prs = issueKeysToPRs[issueToPRKey];
+        if (prs) {
+            return prs
+        }
+
+        return new Set();
     }
 
     async function maybeUpdatePRCache(owner: string, repo: string): Promise<void> {
@@ -66,7 +74,6 @@ namespace Github {
         const storage = getStorage();
         const storedIssueToPRs = await storage.get(keysToFetch);
         const mergedIssueToPRs = {} as ObjectStringToAny;
-        // TODO: this is broken: we shouldn't iterate over the stored values, which could be missing.
         for (const issueNum in remoteIssueToOpenPRs) {
             // TODO: should we remove outdated PRs, e.g. if stored has something remote doesn't?
             const remoteOpenPRs = remoteIssueToOpenPRs[issueNum];

@@ -11,7 +11,7 @@ namespace GithubPageIssue {
         const {repo, owner, issueNumber} = getRepoOwnerIssueNum(window.location);
         // TODO: if we throw, should we notify the user? Should we always add content?
         let prs = await Github.getPRsForIssue(owner, repo, issueNumber);
-        console.log(prs);
+        console.log(prs); // todo: test network, test merging, other pages.
         // addToDOM(prs);
     }
 
