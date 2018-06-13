@@ -7,11 +7,25 @@ namespace GithubPageIssue {
         return RE_URL.test(url.toString());
     }
 
-    export function inject() {
+    export async function inject() {
         const {repo, owner, issueNumber} = getRepoOwnerIssueNum(window.location);
-        Github.getPRForIssue(owner, repo, issueNumber).then(pr => {
-            // TODO: mutate the dom.
-        });
+        // TODO: if we throw, should we notify the user? Should we always add content?
+        let prs = await Github.getPRsForIssue(owner, repo, issueNumber);
+        console.log(prs);
+        // addToDOM(prs);
+    }
+
+    function addToDOM(prs: GithubEndpoint.PR[]) {
+        const newNodes = prs.map(createNodeForPR);
+        const container = document.createElement('div');
+        newNodes.forEach(node => container.appendChild(node));
+
+        // TODO: find github node, add child.
+    }
+
+    function createNodeForPR(pr: GithubEndpoint.PR): HTMLDivElement {
+        const node = document.createElement('div');
+        return node;
     }
 
     function getRepoOwnerIssueNum(url: Location) {

@@ -13,6 +13,7 @@
 
     "permissions": [
         "*://api.github.com/*",
-        "webRequest"
+        "webRequest",
+        "storage"
     ]
 }

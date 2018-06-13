@@ -1,6 +1,6 @@
 namespace GithubParser {
 
-    const RE_ISSUE_NUMBER = /#([0-9])+/g
+    const RE_ISSUE_NUMBER = /#([0-9]+)/g
 
     export function getIssueNumsFromTitle(title: string): Array<number> {
         const issueNumbers = [];

@@ -20,53 +20,64 @@ namespace Github {
      *
      * This return promise may reject if there's an error, e.g. in the returned storage or network layers.
      */
-    export async function getPRForIssue(owner: string, repo: string, issueNumber: number): Promise<GithubEndpoint.PR[]> {
-        // todo: add storage perm.
-        await ensurePRCacheUpdated(owner, repo);
-        return getStorage().get(getKeyIssueToPR(owner, repo, issueNumber));
+    export async function getPRsForIssue(owner: string, repo: string, issueNumber: number): Promise<GithubEndpoint.PR[]> {
+        try {
+            await maybeUpdatePRCache(owner, repo);
+        } catch (e) {
+            Log.e(`Unable to update PR cache, will fall back: ${e}`);
+        }
+        return getStorage().get(getKeyIssueToPR(owner, repo, issueNumber)); // TODO: convert keys to PR numbers.
     }
 
-    async function ensurePRCacheUpdated(owner: string, repo: string): Promise<void> {
+    async function maybeUpdatePRCache(owner: string, repo: string): Promise<void> {
         await maybeUpgradeDB();
 
         const { lastUpdateMillis } = await getStorage().get(KEY_LAST_UPDATE_MILLIS);
         const nowMillis = new Date().getTime();
         if (!lastUpdateMillis || lastUpdateMillis + MILLIS_BETWEEN_UPDATES < nowMillis) {
+            Log.d('Fetching new data');
             await fetchAndMergeOpenPRs(owner, repo);
+        } else {
+            Log.d('Using cached data');
         }
     }
 
     async function fetchAndMergeOpenPRs(owner: string, repo: string): Promise<void> {
-        let issueToPRs = Types.newDefaultStringToArrayNumSet(); // Set to remove dupes.
-        const prs = await GithubEndpoint.fetchOpenPRs(owner, repo)
-        prs.forEach(pr => {
+        let issueToPRs = {} as ObjectNumberToNumberSet
+        const fetchedPRs = await GithubEndpoint.fetchOpenPRs(owner, repo)
+        fetchedPRs.forEach(pr => {
             GithubParser.getIssueNumsFromTitle(pr.title).forEach(issueNum => {
-                issueToPRs[issueNum].add(pr.id);
+                let prsToStore = issueToPRs[issueNum];
+                if (!prsToStore) {
+                    prsToStore = new Set();
+                    issueToPRs[issueNum] = prsToStore;
+                }
+                prsToStore.add(pr.number);
             });
         });
 
-        await mergeOpenPRs(issueToPRs);
+        await mergeOpenPRs(owner, repo, issueToPRs);
     }
 
-    async function mergeOpenPRs(remoteIssueToOpenPRs: StringToArrayNumSet): Promise<void> {
-        const remoteIssueNums = []; // TODO: better keys? Helper fn?
-        for (const issueNum in remoteIssueToOpenPRs) { remoteIssueNums.push(issueNum); }
+    async function mergeOpenPRs(owner: string, repo: string, remoteIssueToOpenPRs: ObjectNumberToNumberSet): Promise<void> {
+        const keysToFetch = [] as string[]; // TODO: better keys? Helper fn?
+        for (const issueNum in remoteIssueToOpenPRs) { keysToFetch.push(getKeyIssueToPR(owner, repo, parseInt(issueNum))); }
 
         const storage = getStorage();
-        const storedIssueToPRs = await storage.get(remoteIssueNums);
-        const mergedIssueToPRs = {} as ObjectKeyToAny;
-        for (const key in storedIssueToPRs) { // todo: contains all requested keys, right?
-            const issueNum = extractIssueNumFromKeyIssueToPR(key);
-            if (issueNum === null) { throw new Error('Issue number from key unexpectedly null'); }
-
+        const storedIssueToPRs = await storage.get(keysToFetch);
+        const mergedIssueToPRs = {} as ObjectStringToAny;
+        // TODO: this is broken: we shouldn't iterate over the stored values, which could be missing.
+        for (const issueNum in remoteIssueToOpenPRs) {
             // TODO: should we remove outdated PRs, e.g. if stored has something remote doesn't?
             const remoteOpenPRs = remoteIssueToOpenPRs[issueNum];
-            const storedOpenPRs = storedIssueToPRs[issueNum] as number[];
+            const storedOpenPRs = storedIssueToPRs[issueNum] as Set<number>;
 
             const mergedOpenPRs = new Set(remoteOpenPRs);
-            storedOpenPRs.forEach(prNum => mergedOpenPRs.add(prNum));
+            if (storedOpenPRs) {
+                storedOpenPRs.forEach(prNum => mergedOpenPRs.add(prNum));
+            }
 
-            mergedIssueToPRs[key] = mergedOpenPRs; // TODO: can we store Set?
+            mergedIssueToPRs[getKeyIssueToPR(owner, repo, parseInt(issueNum))] = mergedOpenPRs;
         }
 
         mergedIssueToPRs[KEY_LAST_UPDATE_MILLIS] = new Date().getTime();
@@ -80,7 +91,7 @@ namespace Github {
         const storage = getStorage();
         const { dbVersion } = await storage.get(KEY_DB_VERSION);
         if (!dbVersion) {
-            const storageObj = {} as ObjectKeyToAny
+            const storageObj = {} as ObjectStringToAny
             storageObj[KEY_DB_VERSION] = DB_VERSION;
             await storage.set(storageObj);
         } else if (dbVersion !== DB_VERSION) {
@@ -93,7 +104,7 @@ namespace Github {
     function getStorage(): browser.storage.StorageArea { return browser.storage.local; }
 
     function getKeyIssueToPR(owner: string, repo: string, issue: number): string {
-        return `is_${owner}_${repo}_${issue}`;
+        return `is/${owner}/${repo}/${issue}`;
     }
 
     function extractIssueNumFromKeyIssueToPR(key: string): number | null {

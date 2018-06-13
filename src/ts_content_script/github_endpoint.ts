@@ -2,13 +2,13 @@
  * Makes calls directly to the GitHub endpoint without caching.
  */
 namespace GithubEndpoint {
-    const SHOULD_MAKE_REQUEST = true;
+    const SHOULD_MAKE_REQUEST = false;
 
     const BASE_URL = "https://api.github.com";
 
     export function fetchOpenPRs(owner: string, repo: string): Promise<Array<PR>> {
         if (!SHOULD_MAKE_REQUEST) {
-            return new Promise((res, rej) => { res([]); }); // TODO: dummy data.
+            return Promise.resolve(testData);
         }
 
         const url = `${BASE_URL}/repos/${owner}/${repo}/pulls?state=open`
@@ -31,7 +31,15 @@ namespace GithubEndpoint {
     }
 
     export interface PR {
-        id: number,
+        number: number,
         title: string,
     }
+
+    const testData = [{
+        number: 884,
+        title: "[WAITING ON CI] Closes #883: Upgrade support lib and SDK to 27",
+    }, {
+        number: 725,
+        title: "[NO MERGE] Double-tap to page up/down.",
+    }];
 }

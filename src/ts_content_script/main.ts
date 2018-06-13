@@ -8,7 +8,10 @@ const registeredGithubPageTypes: Array<GithubPageType> = [
     GithubPagePR,
 ];
 
-function onPageLoad() { // Called by github_navigation.js.
+async function onPageLoad() { // Called by github_navigation.js.
+    // TODO: remove added node (pass in container? location would depend on page though).
+    await browser.storage.local.clear();
+
     const url = window.location;
     const matchingPageType = registeredGithubPageTypes.find(page => {
         return page.urlMatches(url);
