@@ -12,7 +12,7 @@
     },
     "include": [
         "./typings",
-        "./src/ts_content_script",
+        "./src/ts",
         "./src/github_navigation.js",
     ],
 }
