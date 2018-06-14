@@ -10,6 +10,7 @@
         "target": "es6",
     },
     "include": [
-        "./src/ts_content_script/**/*"
-    ]
+        "./typings",
+        "./src/ts_content_script/**/*",
+    ],
 }
