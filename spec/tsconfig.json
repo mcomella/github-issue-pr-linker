@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "outFile": "./dist/tests.spec.js",
+        "sourceMap": true,
+
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+
+        "target": "es6",
+    },
+    "include": [
+        "../typings",
+        "../src/ts", /* Ideally, we'd use the compiled output but we'd lose type info. */
+        "./",
+    ]
+}
