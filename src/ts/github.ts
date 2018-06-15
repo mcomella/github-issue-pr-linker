@@ -4,16 +4,11 @@
  */
 namespace Github {
 
-    const DB_VERSION = 1;
-    const KEY_DB_VERSION = 'dbVersion';
-
     const KEY_LAST_UPDATE_MILLIS = 'lastUpdateMillis';
     const RE_KEY_ISSUE_TO_PR = /([0-9]+)$/
 
     const MIN_BETWEEN_UPDATES = 5;
     const MILLIS_BETWEEN_UPDATES = MIN_BETWEEN_UPDATES * 60 /* sec */ * 1000 /* ms */;
-
-    let isDBInit = false;
 
     /*
      * Gets the linked PRs for the given issue.
@@ -38,9 +33,10 @@ namespace Github {
     }
 
     async function maybeUpdatePRCache(owner: string, repo: string): Promise<void> {
-        await maybeUpgradeDB();
+        const storage = getStorage();
+        await GithubStore.maybeUpgrade(storage);
 
-        const { lastUpdateMillis } = await getStorage().get(KEY_LAST_UPDATE_MILLIS);
+        const { lastUpdateMillis } = await storage.get(KEY_LAST_UPDATE_MILLIS);
         const nowMillis = new Date().getTime();
         if (!lastUpdateMillis || lastUpdateMillis + MILLIS_BETWEEN_UPDATES < nowMillis) {
             Log.d('Fetching new data');
@@ -90,22 +86,6 @@ namespace Github {
         mergedIssueToPRs[KEY_LAST_UPDATE_MILLIS] = new Date().getTime();
 
         await storage.set(mergedIssueToPRs);
-    }
-
-    async function maybeUpgradeDB(): Promise<void> {
-        if (isDBInit) { return; }
-
-        const storage = getStorage();
-        const { dbVersion } = await storage.get(KEY_DB_VERSION);
-        if (!dbVersion) {
-            const storageObj = {} as ObjectStringToAny
-            storageObj[KEY_DB_VERSION] = DB_VERSION;
-            await storage.set(storageObj);
-        } else if (dbVersion !== DB_VERSION) {
-            // Upgrade for future versions...
-        }
-
-        isDBInit = true;
     }
 
     function getStorage(): browser.storage.StorageArea { return browser.storage.local; }
