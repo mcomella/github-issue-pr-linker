@@ -4,7 +4,6 @@
  */
 namespace Github {
 
-    const KEY_LAST_UPDATE_MILLIS = 'lastUpdateMillis';
     const RE_KEY_ISSUE_TO_PR = /([0-9]+)$/
 
     const MIN_BETWEEN_UPDATES = 5;
@@ -36,7 +35,7 @@ namespace Github {
         const storage = getStorage();
         await GithubStore.maybeUpgrade(storage);
 
-        const { lastUpdateMillis } = await storage.get(KEY_LAST_UPDATE_MILLIS);
+        const lastUpdateMillis = await GithubStore.getLastUpdateMillis()
         const nowMillis = new Date().getTime();
         if (!lastUpdateMillis || lastUpdateMillis + MILLIS_BETWEEN_UPDATES < nowMillis) {
             Log.d('Fetching new data');
