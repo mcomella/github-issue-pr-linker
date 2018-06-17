@@ -1,3 +1,6 @@
+/*
+ * Cached data from the Github API with metadata convenient for access (e.g. lastUpdateMillis).
+ */
 namespace GithubCache {
     export type StorageArea = browser.storage.StorageArea;
 
