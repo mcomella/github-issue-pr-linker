@@ -11,21 +11,43 @@ namespace GithubPageIssue {
         const {repo, owner, issueNumber} = getRepoOwnerIssueNum(window.location);
         // TODO: if we throw, should we notify the user? Should we always add content?
         let prs = await Github.getPRsForIssue(owner, repo, issueNumber);
-        console.log(prs); // todo: test network, test merging, other pages.
-        // addToDOM(prs);
+        addToDOM(owner, repo, issueNumber, prs);
     }
 
-    function addToDOM(prs: GithubEndpoint.PR[]) {
-        const newNodes = prs.map(createNodeForPR);
+    function addToDOM(owner: string, repo: string, issueNumber: number, prs: Set<number>) {
         const container = document.createElement('div');
-        newNodes.forEach(node => container.appendChild(node));
 
-        // TODO: find github node, add child.
+        const titleNode = document.createElement('p');
+        titleNode.innerText = 'PRs whose titles reference this issue (non-exhaustive):';
+        titleNode.style.marginBottom = '0'; // Override GH style.
+        container.appendChild(titleNode);
+
+        const listNode = document.createElement('ul');
+        listNode.style.paddingLeft = '40px';
+        listNode.style.marginBottom = '14px';
+        container.appendChild(listNode);
+        const newNodes = Array.from(prs).map(prNum => createNodeForPR(owner, repo, prNum));
+        newNodes.forEach(node => listNode.appendChild(node));
+
+        insertAboveConversation(container);
     }
 
-    function createNodeForPR(pr: GithubEndpoint.PR): HTMLDivElement {
-        const node = document.createElement('div');
-        return node;
+    function insertAboveConversation(node: HTMLElement) {
+        const threadNode = document.getElementById('discussion_bucket');
+        if (threadNode && threadNode.parentNode) {
+            threadNode.parentNode.insertBefore(node, threadNode);
+        }
+    }
+
+    function createNodeForPR(owner: string, repo: string, prNum: number) {
+        const listNode = document.createElement('li');
+
+        const linkNode = document.createElement('a');
+        linkNode.href = `https://github.com/${owner}/${repo}/pull/${prNum}`
+        linkNode.innerText = `#${prNum}`
+        listNode.appendChild(linkNode);
+
+        return listNode;
     }
 
     function getRepoOwnerIssueNum(url: Location) {

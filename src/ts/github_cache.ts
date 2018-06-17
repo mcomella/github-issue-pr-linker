@@ -36,6 +36,7 @@ namespace GithubCache {
         isDBInit = false;
     }
 
+    // TODO: do for owner/repo
     export async function getLastUpdateMillis(_storage?: StorageArea): Promise<number | null> {
         if (!_storage) { _storage = getStorage() }
         _maybeUpgrade(_storage)
