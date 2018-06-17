@@ -32,16 +32,16 @@ namespace Github {
         const nowMillis = new Date().getTime();
         if (!lastUpdateMillis || lastUpdateMillis + MILLIS_BETWEEN_UPDATES < nowMillis) {
             Log.d('Fetching new data');
-
-            await fetchAndMergeOpenPRs(owner, repo);
+            const fetchedPRs = await GithubEndpoint.fetchOpenPRs(owner, repo);
+            const issueToPRs = _convertFetchedPRsToIssuesToPRs(fetchedPRs);
+            await GithubCache.mergeIssueToPRs(owner, repo, issueToPRs);
         } else {
             Log.d('Using cached data');
         }
     }
 
-    async function fetchAndMergeOpenPRs(owner: string, repo: string): Promise<void> {
+    export function _convertFetchedPRsToIssuesToPRs(fetchedPRs: GithubEndpoint.PR[]): ObjectNumberToNumberSet {
         let issueToPRs = {} as ObjectNumberToNumberSet
-        const fetchedPRs = await GithubEndpoint.fetchOpenPRs(owner, repo)
         fetchedPRs.forEach(pr => {
             GithubParser.getIssueNumsFromTitle(pr.title).forEach(issueNum => {
                 let prsToStore = issueToPRs[issueNum];
@@ -52,7 +52,6 @@ namespace Github {
                 prsToStore.add(pr.number);
             });
         });
-
-        await GithubCache.mergeIssueToPRs(owner, repo, issueToPRs);
+        return issueToPRs;
     }
 }
