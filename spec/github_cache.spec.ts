@@ -14,12 +14,12 @@ describe('The GithubStore', () => {
     it('inits the DB with the current version when empty', async () => {
         await GithubCache._maybeUpgrade(mockStore)
         expect(Object.keys(backingData).length).toBe(1)
-        expect(backingData[GithubCache.KEY_DB_VERSION]).toBe(GithubCache.DB_VERSION)
+        expect(backingData[GithubCache.KEY_DB_VERSION]).toEqual(GithubCache.DB_VERSION)
     });
 
-    it('gets null for the last update millis if it hasn\'t been stored', async () => {
+    it('gets falsy for the last update millis if it hasn\'t been stored', async () => {
         const lastUpdateMillis = await GithubCache.getLastUpdateMillis(mockStore);
-        expect(lastUpdateMillis).toBeNull;
+        expect(lastUpdateMillis).toBeFalsy;
     });
 
     it('getIssueToPRs from empty DB returns falsy', async () => {
@@ -37,7 +37,7 @@ describe('The GithubStore', () => {
         backingData[key] = expectedValue;
 
         const actualValue = await GithubCache.getIssueToPRs(owner, repo, issueNum, mockStore);
-        expect(actualValue).toBe(expectedValue);
+        expect(actualValue).toEqual(expectedValue);
     });
 
     it('getIssuesToPRs returns PRs for issues', async () => {
@@ -55,8 +55,7 @@ describe('The GithubStore', () => {
         backingData[secondKey] = expectedValue[12];
 
         const actualValue = await GithubCache.getIssuesToPRs(owner, repo, [4, 12], mockStore);
-        expect(actualValue[4]).toBe(expectedValue[4]);
-        expect(actualValue[12]).toBe(expectedValue[12]);
+        expect(actualValue).toEqual(expectedValue);
     });
 
     it('saves issue to PRs directly with no existing data', async () => {
