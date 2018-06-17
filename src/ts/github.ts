@@ -4,8 +4,6 @@
  */
 namespace Github {
 
-    const RE_KEY_ISSUE_TO_PR = /([0-9]+)$/
-
     const MIN_BETWEEN_UPDATES = 5;
     const MILLIS_BETWEEN_UPDATES = MIN_BETWEEN_UPDATES * 60 /* sec */ * 1000 /* ms */;
 
@@ -21,9 +19,7 @@ namespace Github {
             Log.e(`Unable to update PR cache, will fall back: ${e}`);
         }
 
-        const issueToPRKey = getKeyIssueToPR(owner, repo, issueNumber);
-        const issueKeysToPRs = await getStorage().get(issueToPRKey) as ObjectStringToNumberSet;
-        const prs = issueKeysToPRs[issueToPRKey];
+        const prs = await GithubCache.getIssueToPRs(owner, repo, issueNumber);
         if (prs) {
             return prs
         }
@@ -32,10 +28,7 @@ namespace Github {
     }
 
     async function maybeUpdatePRCache(owner: string, repo: string): Promise<void> {
-        const storage = getStorage();
-        await GithubStore.maybeUpgrade(storage);
-
-        const lastUpdateMillis = await GithubStore.getLastUpdateMillis()
+        const lastUpdateMillis = await GithubCache.getLastUpdateMillis()
         const nowMillis = new Date().getTime();
         if (!lastUpdateMillis || lastUpdateMillis + MILLIS_BETWEEN_UPDATES < nowMillis) {
             Log.d('Fetching new data');
@@ -59,43 +52,6 @@ namespace Github {
             });
         });
 
-        await mergeOpenPRs(owner, repo, issueToPRs);
-    }
-
-    async function mergeOpenPRs(owner: string, repo: string, remoteIssueToOpenPRs: ObjectNumberToNumberSet): Promise<void> {
-        const keysToFetch = [] as string[]; // TODO: better keys? Helper fn?
-        for (const issueNum in remoteIssueToOpenPRs) { keysToFetch.push(getKeyIssueToPR(owner, repo, parseInt(issueNum))); }
-
-        const storage = getStorage();
-        const storedIssueToPRs = await storage.get(keysToFetch);
-        const mergedIssueToPRs = {} as ObjectStringToAny;
-        for (const issueNum in remoteIssueToOpenPRs) {
-            // TODO: should we remove outdated PRs, e.g. if stored has something remote doesn't?
-            const remoteOpenPRs = remoteIssueToOpenPRs[issueNum];
-            const storedOpenPRs = storedIssueToPRs[issueNum] as Set<number>;
-
-            const mergedOpenPRs = new Set(remoteOpenPRs);
-            if (storedOpenPRs) {
-                storedOpenPRs.forEach(prNum => mergedOpenPRs.add(prNum));
-            }
-
-            mergedIssueToPRs[getKeyIssueToPR(owner, repo, parseInt(issueNum))] = mergedOpenPRs;
-        }
-
-        mergedIssueToPRs[KEY_LAST_UPDATE_MILLIS] = new Date().getTime();
-
-        await storage.set(mergedIssueToPRs);
-    }
-
-    function getStorage(): browser.storage.StorageArea { return browser.storage.local; }
-
-    function getKeyIssueToPR(owner: string, repo: string, issue: number): string {
-        return `is/${owner}/${repo}/${issue}`;
-    }
-
-    function extractIssueNumFromKeyIssueToPR(key: string): number | null {
-        const matches = RE_KEY_ISSUE_TO_PR.exec(key);
-        if (!matches) { return null; }
-        return parseInt(matches[1]);
+        await GithubCache.mergeIssueToPRs(owner, repo, issueToPRs);
     }
 }
