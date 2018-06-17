@@ -24,6 +24,12 @@ Build and run the tests:
 tsc -p spec && jasmine
 ```
 
+## Publishing
+`out/bundle.xpi` will be created after:
+```sh
+./publish.sh
+```
+
 ## License
 Typescript type definitions (`src/ts_content_script/types/`) are available [via
 DefinitelyTyped][typed] under the MIT license. The license file is included in that directory.

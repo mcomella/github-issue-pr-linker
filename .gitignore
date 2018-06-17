@@ -1,4 +1,5 @@
 # Build
+out/
 src/dist/
 spec/dist
 
