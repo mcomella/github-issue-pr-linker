@@ -1,9 +1,9 @@
-interface GithubPageType {
+interface GithubPageFns {
     urlMatches: Function,
     inject: Function,
 }
 
-const registeredGithubPageTypes: Array<GithubPageType> = [
+const registeredGithubPageFns: Array<GithubPageFns> = [
     GithubPageIssue,
     GithubPagePR,
 ];
@@ -11,7 +11,7 @@ const registeredGithubPageTypes: Array<GithubPageType> = [
 async function onPageLoad() { // Called by github_navigation.js.
     // TODO: remove added node (pass in container? location would depend on page though).
     const url = window.location;
-    const matchingPageType = registeredGithubPageTypes.find(page => {
+    const matchingPageType = registeredGithubPageFns.find(page => {
         return page.urlMatches(url);
     });
 

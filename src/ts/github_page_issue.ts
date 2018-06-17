@@ -26,7 +26,8 @@ namespace GithubPageIssue {
         listNode.style.paddingLeft = '40px';
         listNode.style.marginBottom = '14px';
         container.appendChild(listNode);
-        const newNodes = Array.from(prs).map(prNum => createNodeForPR(owner, repo, prNum));
+        const newNodes = Array.from(prs).map(prNum =>
+                GithubDOM.createNodeForIssue(owner, repo, GithubPageType.PR, prNum));
         newNodes.forEach(node => listNode.appendChild(node));
 
         insertAboveConversation(container);
@@ -37,17 +38,6 @@ namespace GithubPageIssue {
         if (threadNode && threadNode.parentNode) {
             threadNode.parentNode.insertBefore(node, threadNode);
         }
-    }
-
-    function createNodeForPR(owner: string, repo: string, prNum: number) {
-        const listNode = document.createElement('li');
-
-        const linkNode = document.createElement('a');
-        linkNode.href = `https://github.com/${owner}/${repo}/pull/${prNum}`
-        linkNode.innerText = `#${prNum}`
-        listNode.appendChild(linkNode);
-
-        return listNode;
     }
 
     function getRepoOwnerIssueNum(url: Location) {

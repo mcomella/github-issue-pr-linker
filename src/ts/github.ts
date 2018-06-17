@@ -1,3 +1,7 @@
+const enum GithubPageType {
+    ISSUE, PR,
+}
+
 /*
  * The main interface to the GitHub API for the extension: it provides caching
  * and logic.
