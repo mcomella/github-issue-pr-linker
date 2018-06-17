@@ -22,8 +22,41 @@ describe('The GithubStore', () => {
         expect(lastUpdateMillis).toBeNull;
     });
 
-    it('gets pr data', async () => {
-        // todo: getIssuesToPRs, getIssueToPRs
+    it('getIssueToPRs from empty DB returns falsy', async () => {
+        const actualValue = await GithubCache.getIssueToPRs('r', 'o', 4, mockStore);
+        expect(actualValue).toBeFalsy();
+    });
+
+    it('getIssueToPRs returns PRs for issue', async () => {
+        const owner = 'owner';
+        const repo = 'repo';
+        const issueNum = 4;
+
+        const key = GithubCache.getKeyIssueToPR(owner, repo, issueNum);
+        const expectedValue = new Set([1, 2, 3]);
+        backingData[key] = expectedValue;
+
+        const actualValue = await GithubCache.getIssueToPRs(owner, repo, issueNum, mockStore);
+        expect(actualValue).toBe(expectedValue);
+    });
+
+    it('getIssuesToPRs returns PRs for issues', async () => {
+        const owner = 'owner';
+        const repo = 'repo';
+
+        const expectedValue = {
+            4: new Set([1, 2, 3]),
+            12: new Set([4, 5, 6]),
+        }
+
+        const firstKey = GithubCache.getKeyIssueToPR(owner, repo, 4);
+        backingData[firstKey] = expectedValue[4];
+        const secondKey = GithubCache.getKeyIssueToPR(owner, repo, 12);
+        backingData[secondKey] = expectedValue[12];
+
+        const actualValue = await GithubCache.getIssuesToPRs(owner, repo, [4, 12], mockStore);
+        expect(actualValue[4]).toBe(expectedValue[4]);
+        expect(actualValue[12]).toBe(expectedValue[12]);
     });
 
     it('saves issue to PRs directly with no existing data', async () => {
