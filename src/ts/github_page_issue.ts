@@ -30,14 +30,7 @@ namespace GithubPageIssue {
                 GithubDOM.createNodeForIssue(owner, repo, GithubPageType.PR, prNum));
         newNodes.forEach(node => listNode.appendChild(node));
 
-        insertAboveConversation(container);
-    }
-
-    function insertAboveConversation(node: HTMLElement) {
-        const threadNode = document.getElementById('discussion_bucket');
-        if (threadNode && threadNode.parentNode) {
-            threadNode.parentNode.insertBefore(node, threadNode);
-        }
+        GithubDOM.insertAboveConversation(container);
     }
 
     function getRepoOwnerIssueNum(url: Location) {

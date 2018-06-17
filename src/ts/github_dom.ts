@@ -23,4 +23,11 @@ namespace GithubDOM {
         return listNode;
     }
 
+    export function insertAboveConversation(node: HTMLElement) {
+        const threadNode = document.getElementById('discussion_bucket');
+        if (threadNode && threadNode.parentNode) {
+            threadNode.parentNode.insertBefore(node, threadNode);
+        }
+    }
+
 }
