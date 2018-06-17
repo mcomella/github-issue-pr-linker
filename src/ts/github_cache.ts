@@ -9,8 +9,6 @@ namespace GithubCache {
     export const DB_VERSION = 1; // for testing.
     export const KEY_DB_VERSION = PREFIX_KEY + 'dbVersion';
 
-    export const KEY_LAST_UPDATE_MILLIS = PREFIX_KEY + 'lastUpdateMillis';
-
     const RE_KEY_ISSUE_TO_PR = /([0-9]+)$/
 
     let isDBInit = false;
@@ -36,11 +34,11 @@ namespace GithubCache {
         isDBInit = false;
     }
 
-    // TODO: do for owner/repo
-    export async function getLastUpdateMillis(_storage?: StorageArea): Promise<number | null> {
+    export async function getLastUpdateMillis(owner: string, repo: string, _storage?: StorageArea): Promise<number | null> {
         if (!_storage) { _storage = getStorage() }
         _maybeUpgrade(_storage)
-        return (await _storage.get(KEY_LAST_UPDATE_MILLIS))[KEY_LAST_UPDATE_MILLIS]
+        const keyLastUpdate = _getKeyLastUpdateMillis(owner, repo);
+        return (await _storage.get(keyLastUpdate))[keyLastUpdate];
     }
 
     export async function getIssuesToPRs(owner: string, repo: string, issueNums: number[], _storage?: StorageArea): Promise<ObjectNumberToNumberSet> {
@@ -89,13 +87,18 @@ namespace GithubCache {
             mergedIssueToPRs[_getKeyIssueToPR(owner, repo, parseInt(issueNum))] = mergedOpenPRs;
         }
 
-        mergedIssueToPRs[KEY_LAST_UPDATE_MILLIS] = new Date().getTime();
+        const keyLastUpdate = _getKeyLastUpdateMillis(owner, repo);
+        mergedIssueToPRs[keyLastUpdate] = new Date().getTime();
 
         return _storage.set(mergedIssueToPRs);
     }
 
     export function _getKeyIssueToPR(owner: string, repo: string, issue: number): string {
-        return PREFIX_KEY + `is/${owner}/${repo}/${issue}`;
+        return PREFIX_KEY + `${owner}/${repo}/issue/${issue}`;
+    }
+
+    export function _getKeyLastUpdateMillis(owner: string, repo: string): string {
+        return PREFIX_KEY + `${owner}/${repo}/lastUpdateMillis`
     }
 
     function extractIssueNumFromKeyIssueToPR(key: string): number | null {

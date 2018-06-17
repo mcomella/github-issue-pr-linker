@@ -17,11 +17,6 @@ describe('The GithubStore', () => {
         expect(backingData[GithubCache.KEY_DB_VERSION]).toEqual(GithubCache.DB_VERSION)
     });
 
-    it('gets falsy for the last update millis if it hasn\'t been stored', async () => {
-        const lastUpdateMillis = await GithubCache.getLastUpdateMillis(mockStore);
-        expect(lastUpdateMillis).toBeFalsy;
-    });
-
     it('getIssueToPRs from empty DB returns falsy', async () => {
         const actualValue = await GithubCache.getIssueToPRs('r', 'o', 4, mockStore);
         expect(actualValue).toBeFalsy();
@@ -87,6 +82,76 @@ describe('The GithubStore', () => {
 
         const actualValue = backingData[GithubCache._getKeyIssueToPR(owner, repo, issueNumber)];
         expect(actualValue).toEqual(new Set([1, 2, 3, 4, 5]));
+    });
+
+    describe('manages lastUpdateMillis which', () => {
+        it('gets falsy if it hasn\'t been stored', async () => {
+            const lastUpdateMillis = await GithubCache.getLastUpdateMillis('o', 'r', mockStore);
+            expect(lastUpdateMillis).toBeFalsy;
+        });
+
+        it('gets the value when set', async () => {
+            const owner = 'own';
+            const repo = 'rep';
+
+            const key = GithubCache._getKeyLastUpdateMillis(owner, repo);
+            const expectedValue = 100;
+            backingData[key] = expectedValue;
+
+            const actualValue = await GithubCache.getLastUpdateMillis(owner, repo, mockStore);
+            expect(actualValue).toEqual(expectedValue);
+        });
+
+        it('gets separate values per repo', async () => {
+            const owners = ['mozilla', 'google'];
+            const repos = ['firefox', 'chrome'];
+            const keys = owners.map((owner, i) => {
+                const repo = repos[i];
+                return GithubCache._getKeyLastUpdateMillis(owner, repo);
+            });
+            const expectedValues = [100, 200];
+            keys.forEach((key, i) => {
+                backingData[key] = expectedValues[i];
+            });
+
+            owners.forEach(async (owner, i) => {
+                const repo = repos[i];
+                const actualValue = await GithubCache.getLastUpdateMillis(owner, repo, mockStore);
+                expect(actualValue).toEqual(expectedValues[i]);
+            });
+        });
+
+        it('sets the value separately, per repo, when merging PRs', async () => {
+            const owners = ['mozilla', 'mcomella'];
+            const repos = ['firefox', 'story-points'];
+            const dummyData = [
+                { 4: new Set([5]) } as ObjectNumberToNumberSet,
+                { 7: new Set([6]) } as ObjectNumberToNumberSet,
+            ];
+
+            function forEachInitialData(block: Function) {
+                owners.forEach(async (owner, i) => {
+                    const repo = repos[i];
+                    const key = GithubCache._getKeyLastUpdateMillis(owner, repo);
+                    block(owner, repo, key);
+                });
+            }
+
+            forEachInitialData((owner: string, repo: string, lastUpdateKey: string) => {
+                expect(backingData[lastUpdateKey]).toBeFalsy(); // Verify empty.
+            });
+
+            const now = new Date().getTime();
+            await Promise.all(owners.map((owner, i) => {
+                const repo = repos[i];
+                const dummyDatum = dummyData[i];
+                return GithubCache.mergeIssueToPRs(owner, repo, dummyDatum, mockStore);
+            }));
+
+            forEachInitialData((owner: string, repo: string, lastUpdateKey: string) => {
+                expect(backingData[lastUpdateKey]).toBeGreaterThanOrEqual(now); // Verify filled.
+            });
+        });
     });
 
     function getMockStore() {

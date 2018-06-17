@@ -32,15 +32,16 @@ namespace Github {
     }
 
     async function maybeUpdatePRCache(owner: string, repo: string): Promise<void> {
-        const lastUpdateMillis = await GithubCache.getLastUpdateMillis()
+        const lastUpdateMillis = await GithubCache.getLastUpdateMillis(owner, repo)
         const nowMillis = new Date().getTime();
+        const ownerRepo = `${owner}/${repo}`;
         if (!lastUpdateMillis || lastUpdateMillis + MILLIS_BETWEEN_UPDATES < nowMillis) {
-            Log.d('Fetching new data');
+            Log.d(`${ownerRepo} - fetching new data`);
             const fetchedPRs = await GithubEndpoint.fetchOpenPRs(owner, repo);
             const issueToPRs = _convertFetchedPRsToIssuesToPRs(fetchedPRs);
             await GithubCache.mergeIssueToPRs(owner, repo, issueToPRs);
         } else {
-            Log.d('Using cached data');
+            Log.d(`${ownerRepo} - using cached data`);
         }
     }
 

@@ -9,9 +9,12 @@
 
         "target": "es6",
     },
+
+    // TODO: consider inheriting the files here.
     "include": [
         "../typings",
         "../src/ts", /* Ideally, we'd use the compiled output but we'd lose type info. */
+        "../src/options/options_store.ts",
         "./",
     ]
 }
