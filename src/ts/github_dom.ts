@@ -3,6 +3,14 @@
  */
 namespace GithubDOM {
 
+    const CONTAINER_ID = 'github-issue-pr-linker-container';
+
+    export function newContainerNode() {
+        const container = document.createElement('div');
+        container.id = CONTAINER_ID;
+        return container;
+    }
+
     export function createNodeForIssue(owner: string, repo: string, issueType: GithubPageType, num: number) {
         let issueTypeForUrl: string;
         if (issueType === GithubPageType.ISSUE) {
@@ -29,5 +37,4 @@ namespace GithubDOM {
             threadNode.parentNode.insertBefore(node, threadNode);
         }
     }
-
 }

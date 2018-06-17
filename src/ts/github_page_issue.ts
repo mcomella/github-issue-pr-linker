@@ -15,7 +15,7 @@ namespace GithubPageIssue {
     }
 
     function addToDOM(owner: string, repo: string, issueNumber: number, prs: Set<number>) {
-        const container = document.createElement('div');
+        const container = GithubDOM.newContainerNode();
 
         const titleNode = document.createElement('p');
         titleNode.innerText = 'PRs whose titles reference this issue (non-exhaustive):';
