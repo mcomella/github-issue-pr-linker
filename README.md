@@ -8,6 +8,11 @@ Install the typescript compiler (through `npm`) and run with:
 tsc
 ```
 
+The options menu uses a separate compile target so if you're modifying `options.ts`:
+```sh
+tsc -p src/options
+```
+
 In Firefox, you can load [a temporary add-on][temp addon] for testing.
 Add the `-w` argument for continuous compilation.
 
