@@ -7,13 +7,13 @@
     "description": "",
 
     "options_ui": {
-        "page": "dist/options.html",
+        "page": "src/dist/options.html",
         "browser_style": true
     },
 
     "content_scripts": [{
         "matches": ["*://*.github.com/*"],
-        "js": ["dist/content_script.js"]
+        "js": ["src/dist/content_script.js"]
     }],
 
     "permissions": [

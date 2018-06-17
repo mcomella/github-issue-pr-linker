@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outFile": "./dist/content_script.js",
+        "outFile": "./src/dist/content_script.js",
         "sourceMap": true,
         "allowJs": true,
 

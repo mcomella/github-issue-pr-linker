@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outFile": "../../dist/options.js",
+        "outFile": "../dist/options.js",
         "sourceMap": true,
 
         "strictNullChecks": true,
