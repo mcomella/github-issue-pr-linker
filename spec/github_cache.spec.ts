@@ -12,7 +12,7 @@ describe('The GithubStore', () => {
     });
 
     it('inits the DB with the current version when empty', async () => {
-        await GithubCache.maybeUpgrade(mockStore)
+        await GithubCache._maybeUpgrade(mockStore)
         expect(Object.keys(backingData).length).toBe(1)
         expect(backingData[GithubCache.KEY_DB_VERSION]).toBe(GithubCache.DB_VERSION)
     });
@@ -32,7 +32,7 @@ describe('The GithubStore', () => {
         const repo = 'repo';
         const issueNum = 4;
 
-        const key = GithubCache.getKeyIssueToPR(owner, repo, issueNum);
+        const key = GithubCache._getKeyIssueToPR(owner, repo, issueNum);
         const expectedValue = new Set([1, 2, 3]);
         backingData[key] = expectedValue;
 
@@ -49,9 +49,9 @@ describe('The GithubStore', () => {
             12: new Set([4, 5, 6]),
         }
 
-        const firstKey = GithubCache.getKeyIssueToPR(owner, repo, 4);
+        const firstKey = GithubCache._getKeyIssueToPR(owner, repo, 4);
         backingData[firstKey] = expectedValue[4];
-        const secondKey = GithubCache.getKeyIssueToPR(owner, repo, 12);
+        const secondKey = GithubCache._getKeyIssueToPR(owner, repo, 12);
         backingData[secondKey] = expectedValue[12];
 
         const actualValue = await GithubCache.getIssuesToPRs(owner, repo, [4, 12], mockStore);
@@ -69,7 +69,7 @@ describe('The GithubStore', () => {
 
         await GithubCache.mergeIssueToPRs(owner, repo, input, mockStore)
 
-        const actualValue = backingData[GithubCache.getKeyIssueToPR(owner, repo, issueNumber)];
+        const actualValue = backingData[GithubCache._getKeyIssueToPR(owner, repo, issueNumber)];
         expect(actualValue).toEqual(new Set([1, 2, 3]));
     });
 
@@ -86,7 +86,7 @@ describe('The GithubStore', () => {
         secondInput[issueNumber] = new Set([3, 4, 5]);
         await GithubCache.mergeIssueToPRs(owner, repo, secondInput, mockStore)
 
-        const actualValue = backingData[GithubCache.getKeyIssueToPR(owner, repo, issueNumber)];
+        const actualValue = backingData[GithubCache._getKeyIssueToPR(owner, repo, issueNumber)];
         expect(actualValue).toEqual(new Set([1, 2, 3, 4, 5]));
     });
 

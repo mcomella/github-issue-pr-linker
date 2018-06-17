@@ -32,6 +32,7 @@ namespace Github {
         const nowMillis = new Date().getTime();
         if (!lastUpdateMillis || lastUpdateMillis + MILLIS_BETWEEN_UPDATES < nowMillis) {
             Log.d('Fetching new data');
+
             await fetchAndMergeOpenPRs(owner, repo);
         } else {
             Log.d('Using cached data');

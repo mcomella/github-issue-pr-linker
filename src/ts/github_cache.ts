@@ -12,7 +12,7 @@ namespace GithubCache {
 
     let isDBInit = false;
 
-    export async function maybeUpgrade(_storage?: StorageArea, _newVersion?: number): Promise<void> {
+    export async function _maybeUpgrade(_storage?: StorageArea, _newVersion?: number): Promise<void> {
         if (isDBInit) { return; }
         if (!_storage) { _storage = getStorage() }
         if (!_newVersion) { _newVersion = DB_VERSION; }
@@ -35,15 +35,15 @@ namespace GithubCache {
 
     export async function getLastUpdateMillis(_storage?: StorageArea): Promise<number | null> {
         if (!_storage) { _storage = getStorage() }
-        maybeUpgrade(_storage)
+        _maybeUpgrade(_storage)
         return (await _storage.get(KEY_LAST_UPDATE_MILLIS))[KEY_LAST_UPDATE_MILLIS]
     }
 
     export async function getIssuesToPRs(owner: string, repo: string, issueNums: number[], _storage?: StorageArea): Promise<ObjectNumberToNumberSet> {
         if (!_storage) { _storage = getStorage() }
-        maybeUpgrade(_storage)
+        _maybeUpgrade(_storage)
 
-        const keysToFetch = issueNums.map(num => getKeyIssueToPR(owner, repo, num));
+        const keysToFetch = issueNums.map(num => _getKeyIssueToPR(owner, repo, num));
         const storedIssueToPRs = await _storage.get(keysToFetch);
         const returnValue = {} as ObjectNumberToNumberSet;
         for (const key in storedIssueToPRs) {
@@ -65,7 +65,7 @@ namespace GithubCache {
 
     export async function mergeIssueToPRs(owner: string, repo: string, remoteIssueToOpenPRs: ObjectNumberToNumberSet, _storage?: StorageArea): Promise<void> {
         if (!_storage) { _storage = getStorage() }
-        maybeUpgrade(_storage)
+        _maybeUpgrade(_storage)
 
         const issueNumsToFetch = [] as number[];
         for (const issueNum in remoteIssueToOpenPRs) { issueNumsToFetch.push(parseInt(issueNum)); }
@@ -82,7 +82,7 @@ namespace GithubCache {
                 storedOpenPRs.forEach(prNum => mergedOpenPRs.add(prNum));
             }
 
-            mergedIssueToPRs[getKeyIssueToPR(owner, repo, parseInt(issueNum))] = mergedOpenPRs;
+            mergedIssueToPRs[_getKeyIssueToPR(owner, repo, parseInt(issueNum))] = mergedOpenPRs;
         }
 
         mergedIssueToPRs[KEY_LAST_UPDATE_MILLIS] = new Date().getTime();
@@ -90,7 +90,7 @@ namespace GithubCache {
         return _storage.set(mergedIssueToPRs);
     }
 
-    export function getKeyIssueToPR(owner: string, repo: string, issue: number): string {
+    export function _getKeyIssueToPR(owner: string, repo: string, issue: number): string {
         return PREFIX_KEY + `is/${owner}/${repo}/${issue}`;
     }
 
