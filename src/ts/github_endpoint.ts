@@ -6,7 +6,7 @@ namespace GithubEndpoint {
 
     const BASE_URL = "https://api.github.com";
 
-    export function fetchOpenPRs(owner: string, repo: string): Promise<Array<PR>> {
+    export async function fetchOpenPRs(owner: string, repo: string): Promise<Array<PR>> {
         if (!SHOULD_MAKE_REQUEST) {
             return Promise.resolve(testData);
         }
@@ -14,13 +14,9 @@ namespace GithubEndpoint {
         const url = `${BASE_URL}/repos/${owner}/${repo}/pulls?state=open`
         const request = new Request(url, {
             method: 'GET',
-            headers: {
-                'Accept': 'application/vnd.github.v3+json',
-            },
+            headers: await getHeaders(),
         });
 
-        // TODO: handle redirection
-        // TODO: handle at API limit.
         return fetch(request).then(response => {
             if (response.status >= 300) {
                 throw new Error('fetchOpenPRs response not success: ' + response.statusText);
@@ -28,6 +24,19 @@ namespace GithubEndpoint {
 
             return response.json();
         });
+    }
+
+    async function getHeaders() {
+        const headers = {
+            'Accept': 'application/vnd.github.v3+json',
+        } as { [key: string]: string };
+
+        const accessToken = await OptionsStore.getPersonalAccessToken();
+        if (accessToken.length > 0) {
+            headers['Authorization'] = `token ${accessToken}`
+        }
+
+        return headers;
     }
 
     export interface PR {

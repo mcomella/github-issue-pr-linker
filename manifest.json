@@ -6,6 +6,11 @@
 
     "description": "",
 
+    "options_ui": {
+        "page": "dist/options.html",
+        "browser_style": true
+    },
+
     "content_scripts": [{
         "matches": ["*://*.github.com/*"],
         "js": ["dist/content_script.js"]

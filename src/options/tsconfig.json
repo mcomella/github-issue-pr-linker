@@ -1,8 +1,7 @@
 {
     "compilerOptions": {
-        "outFile": "./dist/content_script.js",
+        "outFile": "../../dist/options.js",
         "sourceMap": true,
-        "allowJs": true,
 
         "strictNullChecks": true,
         "noImplicitAny": true,
@@ -11,9 +10,7 @@
         "target": "es6",
     },
     "include": [
-        "./typings",
-        "./src/ts",
-        "./src/options/options_store.ts",
-        "./src/github_navigation.js",
-    ],
+        "../../typings",
+        "./",
+    ]
 }
