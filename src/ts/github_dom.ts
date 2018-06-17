@@ -11,6 +11,13 @@ namespace GithubDOM {
         return container;
     }
 
+    export function removeContainerNode() {
+        const maybeContainer = document.getElementById(CONTAINER_ID);
+        if (maybeContainer) {
+            maybeContainer.remove();
+        }
+    }
+
     export function newTitleNode(title: string, linkText?: string, linkTitle?: string) {
         // TODO: link text.
         const titleNode = document.createElement('p');
