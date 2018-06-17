@@ -11,6 +11,21 @@ namespace GithubDOM {
         return container;
     }
 
+    export function newTitleNode(title: string, linkText?: string, linkTitle?: string) {
+        // TODO: link text.
+        const titleNode = document.createElement('p');
+        titleNode.innerText = title;
+        titleNode.style.marginBottom = '0'; // Override GH style.
+        return titleNode;
+    }
+
+    export function newListNode() {
+        const listNode = document.createElement('ul');
+        listNode.style.paddingLeft = '40px';
+        listNode.style.marginBottom = '14px';
+        return listNode;
+    }
+
     export function createNodeForIssue(owner: string, repo: string, issueType: GithubPageType, num: number) {
         let issueTypeForUrl: string;
         if (issueType === GithubPageType.ISSUE) {

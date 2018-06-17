@@ -11,21 +11,18 @@ namespace GithubPageIssue {
         const {repo, owner, issueNumber} = getRepoOwnerIssueNum(window.location);
         // TODO: if we throw, should we notify the user? Should we always add content?
         let prs = await Github.getPRsForIssue(owner, repo, issueNumber);
-        addToDOM(owner, repo, issueNumber, prs);
+        if (prs.size > 0) {
+            addToDOM(owner, repo, issueNumber, prs);
+        }
     }
 
     function addToDOM(owner: string, repo: string, issueNumber: number, prs: Set<number>) {
         const container = GithubDOM.newContainerNode();
-
-        const titleNode = document.createElement('p');
-        titleNode.innerText = 'PRs whose titles reference this issue (non-exhaustive):';
-        titleNode.style.marginBottom = '0'; // Override GH style.
+        const titleNode = GithubDOM.newTitleNode('PRs whose titles reference this issue (non-exhaustive):');
         container.appendChild(titleNode);
-
-        const listNode = document.createElement('ul');
-        listNode.style.paddingLeft = '40px';
-        listNode.style.marginBottom = '14px';
+        const listNode = GithubDOM.newListNode();
         container.appendChild(listNode);
+
         const newNodes = Array.from(prs).map(prNum =>
                 GithubDOM.createNodeForIssue(owner, repo, GithubPageType.PR, prNum));
         newNodes.forEach(node => listNode.appendChild(node));
