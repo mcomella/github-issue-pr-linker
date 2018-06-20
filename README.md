@@ -5,7 +5,7 @@ An add-on that inserts one-click links from GitHub issue to PRs and vice versa:
 
 ![Screenshot of Issue PR Linker](docs/im/issue-to-pr.png)
 
-To use it, each PRs' title must include the issues they affect. For example, a PR with the title, `Closes #123: Update readme.` will create a link from issue `#123` to the PR and vice versa. For more information, see [the user guide.][docs]
+To use it, each PRs' title must include the issues they affect. Issues should be formatted as `#xyz`. For example, a PR with the title, `Closes #123: Update readme.` will create a link from issue `#123` to the PR and vice versa. For more information, see [the user guide.][docs]
 
 ### Alternatives
 [GitHub Issue Hoister][hoister]: this web browser add-on copies links to the top of the page that eventually link from an issue to PR and vice versa. For example, GitHub provides links in their issues such as "mcomella added a commit that referenced this issue". This link will link to a commit that, if part of a PR, will link to the PR associated with the issue.
