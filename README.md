@@ -34,7 +34,7 @@ Build and run the tests:
 tsc -p spec && jasmine
 ```
 
-## Publishing
+### Publishing
 `out/bundle.xpi` will be created after:
 ```sh
 ./publish.sh
