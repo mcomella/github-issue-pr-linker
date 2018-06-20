@@ -4,7 +4,7 @@
     "name": "GitHub Issue PR Linker",
     "version": "0.0.1",
 
-    "description": "",
+    "description": "Inserts one-click links from GitHub issues to PRs and vice versa.",
 
     "options_ui": {
         "page": "src/dist/options.html",
