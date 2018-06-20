@@ -4,7 +4,7 @@
     "name": "GitHub Issue PR Linker",
     "version": "0.0.1",
 
-    "description": "Inserts one-click links from GitHub issues to PRs and vice versa.",
+    "description": "Inserts one-click links from GitHub issues to PRs and vice versa. To use it, each PRs' title must include the issues they affect. For example, a PR with the title, `Closes #123: Update readme.` will create a link from issue `#123` to the PR and vice versa.",
 
     "options_ui": {
         "page": "src/dist/options.html",
