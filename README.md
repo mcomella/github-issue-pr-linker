@@ -31,7 +31,7 @@ tsc -p spec && jasmine
 ```
 
 ## License
-Typescript type definitions (`src/ts_content_script/types/`) are available [via
+Typescript type definitions (`typings/`) are available [via
 DefinitelyTyped][typed] under the MIT license. The license file is included in that directory.
 
 The license included with this repository is based on the X11 license, which is similar to the MIT license.
