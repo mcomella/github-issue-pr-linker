@@ -1,3 +1,5 @@
+**DEPRECATION NOTICE**: The functionality of this add-on has been merged in [APT GitHub Improvements](https://github.com/mcomella/apt_github_improvements). Using this add-on directly is not recommended.
+
 # GitHub Issue PR Linker
 [Available on addons.mozilla.org][AMO]
 
